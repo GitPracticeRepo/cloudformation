@@ -26,6 +26,18 @@
             "Description": "Enter the cidr range of db subnet",
             "Type": "String",
             "Default": "192.168.2.0/24"
+        },
+        "websubnetaz": {
+            "Description": "Select the Web subnet Az",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "appsubnetaz": {
+            "Description": "Select the app subnet Az",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "dbsubnetaz": {
+            "Description": "Select the db subnet Az",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
         }
     },
     "Resources": {
@@ -50,7 +62,9 @@
         "websubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": "ap-south-1a",
+                "AvailabilityZone": {
+                    "Ref": "websubnetaz"
+                },
                 "VpcId": {
                     "Ref": "ntiervpc"
                 },
@@ -68,7 +82,9 @@
         "appsubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": "ap-south-1b",
+                "AvailabilityZone": {
+                    "Ref": "appsubnetaz"
+                },
                 "VpcId": {
                     "Ref": "ntiervpc"
                 },
@@ -86,7 +102,9 @@
         "dbsubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": "ap-south-1a",
+                "AvailabilityZone": {
+                    "Ref": "dbsubnetaz"
+                },
                 "VpcId": {
                     "Ref": "ntiervpc"
                 },
