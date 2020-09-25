@@ -333,6 +333,26 @@
                     "Ref": "private"
                 }
             }
+        },
+        "dbsubnetgroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": "HA for lt",
+                "SubnetIds": [
+                    {
+                        "Ref": "dbsubnet"
+                    },
+                    {
+                        "Ref": "dbsubnetha"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "ntierdbsubnetgroup"
+                    }
+                ]
+            }
         }
     }
 }
