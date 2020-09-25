@@ -65,6 +65,20 @@
         "dbsubnethaaz": {
             "Description": "Select the db subnet HA Az",
             "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "appkeypair": {
+            "Description": "Select the Key pair for app server",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "appserversize": {
+            "Description": "Select the ec2 instance type for app server",
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.micro",
+                "m1.small",
+                "m1.large"
+            ]
         }
     },
     "Resources": {
@@ -354,32 +368,64 @@
                 ]
             }
         },
-        
         "ntier": {
-          "Type": "AWS::RDS::DBInstance",
-          "Properties": {
-            "AllocatedStorage": "20",
-            "DBInstanceClass": "db.t2.micro",
-            "AllowMajorVersionUpgrade": "false",
-            "AutoMinorVersionUpgrade": "false",
-            "BackupRetentionPeriod": "0",
-            "DBInstanceIdentifier": "ltntierdb",
-            "DBName": "ltntier",
-            "DBSubnetGroupName":  { "Ref": "dbsubnetgroup" },
-            "Engine": "mysql",
-            "MasterUsername": "root",
-            "MasterUserPassword": "rootroot",
-            "MultiAZ": "false",
-            "PubliclyAccessible": "true",
-            "StorageType": "gp2",
-            "Tags": [ 
-                {
-                    "Key" : "Name",
-                    "Value" : "ntierdb"
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                "AllocatedStorage": "20",
+                "DBInstanceClass": "db.t2.micro",
+                "AllowMajorVersionUpgrade": "false",
+                "AutoMinorVersionUpgrade": "false",
+                "BackupRetentionPeriod": "0",
+                "DBInstanceIdentifier": "ltntierdb",
+                "DBName": "ltntier",
+                "DBSubnetGroupName": {
+                    "Ref": "dbsubnetgroup"
+                },
+                "Engine": "mysql",
+                "MasterUsername": "root",
+                "MasterUserPassword": "rootroot",
+                "MultiAZ": "false",
+                "PubliclyAccessible": "true",
+                "StorageType": "gp2",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "ntierdb"
+                    }
+                ]
+            }
+        },
+        "appserver": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": {
+                    "Ref": "appkeypair"
+                },
+                "ImageId": "ami-07a29e5e945228fa1",
+                "InstanceType": {
+                    "Ref": "appserversize"
+                },
+                "Monitoring": "false",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "appserver"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -ex",
+                                "sudo apt update",
+                                "apt install tomcat8 -y",
+                                "systemctl enable tomcat8"
+                            ]
+                        ]
+                    }
                 }
-             ]
-          }
+            }
         }
-        
     }
 }
