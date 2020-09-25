@@ -353,6 +353,33 @@
                     }
                 ]
             }
+        },
+        
+        "ntier": {
+          "Type": "AWS::RDS::DBInstance",
+          "Properties": {
+            "AllocatedStorage": "20",
+            "DBInstanceClass": "db.t2.micro",
+            "AllowMajorVersionUpgrade": "false",
+            "AutoMinorVersionUpgrade": "false",
+            "BackupRetentionPeriod": "0",
+            "DBInstanceIdentifier": "ltntierdb",
+            "DBName": "ltntier",
+            "DBSubnetGroupName":  { "Ref": "dbsubnetgroup" },
+            "Engine": "mysql",
+            "MasterUsername": "root",
+            "MasterUserPassword": "rootroot",
+            "MultiAZ": "false",
+            "PubliclyAccessible": "true",
+            "StorageType": "gp2",
+            "Tags": [ 
+                {
+                    "Key" : "Name",
+                    "Value" : "ntierdb"
+                }
+             ]
+          }
         }
+        
     }
 }
