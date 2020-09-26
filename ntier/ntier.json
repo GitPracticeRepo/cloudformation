@@ -368,7 +368,100 @@
                 ]
             }
         },
-        "ntier": {
+        "dbsecuritygroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "This security group is for db",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": {
+                            "Ref": "vpccidrrage"
+                        },
+                        "IpProtocol": "tcp",
+                        "FromPort": "3306",
+                        "ToPort": "3306"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "ntiervpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "dbsecurity"
+                    }
+                ]
+            }
+        },
+        "appsecuritygroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "This is app security group",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": {
+                            "Ref": "vpccidrrage"
+                        },
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22"
+                    },
+                    {
+                        "CidrIp": {
+                            "Ref": "vpccidrrage"
+                        },
+                        "IpProtocol": "tcp",
+                        "FromPort": "8080",
+                        "ToPort": "8080"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "ntiervpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "appsecurity"
+                    }
+                ]
+            }
+        },
+        "websecuritygroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "This is app security group",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22"
+                    },
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80"
+                    },
+                    {
+                        "CidrIp": "0.0.0.0/0",
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "ntiervpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "websecurity"
+                    }
+                ]
+            }
+        },
+        "ntierdb": {
             "Type": "AWS::RDS::DBInstance",
             "Properties": {
                 "AllocatedStorage": "20",
@@ -387,6 +480,9 @@
                 "MultiAZ": "false",
                 "PubliclyAccessible": "true",
                 "StorageType": "gp2",
+                "VPCSecurityGroups": {
+                    "Ref": "dbsecuritygroup"
+                },
                 "Tags": [
                     {
                         "Key": "Name",
@@ -406,6 +502,14 @@
                     "Ref": "appserversize"
                 },
                 "Monitoring": "false",
+                "SubnetId": {
+                    "Ref": "appsubnet"
+                },
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "appsecuritygroup"
+                    }
+                ],
                 "Tags": [
                     {
                         "Key": "Name",
