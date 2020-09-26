@@ -81,6 +81,22 @@
             ]
         }
     },
+    "Mappings": {
+        "RegionMap": {
+            "ap-south-1": {
+                "ubuntu18ami": "ami-03f0fd1a2ba530e75"
+            },
+            "us-east-1":{
+                "ubuntu18ami": "ami-0817d428a6fb68645"
+            },
+            "us-east-2":{
+                "ubuntu18ami": "ami-0e82959d4ed12de3f"
+            },
+            "us-west-2":{
+                "ubuntu18ami": "ami-07a29e5e945228fa1"
+            }
+        }
+    },
     "Resources": {
         "ntiervpc": {
             "Type": "AWS::EC2::VPC",
