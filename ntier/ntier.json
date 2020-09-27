@@ -563,10 +563,10 @@
                         "Fn::Join": [
                             "",
                             [
-                                "#!/bin/bash -ex",
-                                "sudo apt update",
-                                "apt install tomcat8 -y",
-                                "systemctl enable tomcat8"
+                                "#!/bin/bash",
+                                "sudo apt update \n",
+                                "apt install tomcat8 -y \n",
+                                "systemctl enable tomcat8 \n"
                             ]
                         ]
                     }
@@ -617,10 +617,10 @@
                         "Fn::Join": [
                             "",
                             [
-                                "#!/bin/bash",
-                                "sudo apt update",
-                                "sudo apt install apache2 -y",
-                                "sudo systemctl enable apache2"
+                                "#!/bin/bash \n",
+                                "sudo apt update \n",
+                                "sudo apt install apache2 -y \n",
+                                "sudo systemctl enable apache2 \n" 
                             ]
                         ]
                     }
