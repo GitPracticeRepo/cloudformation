@@ -634,7 +634,142 @@
                     }
                 ]
             }
+        },
+        "webserverlc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "AssociatePublicIpAddress" : true,
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "ubuntu18ami"
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "webserversize"
+                },
+                "KeyName": {
+                    "Ref": "keypair"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "websecuritygroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash \n",
+                                "sudo apt-get update \n",
+                                "sudo apt-get install apache2 -y \n",
+                                "sudo apt-get install stress -y \n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "webserverasg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    {
+                        "Ref": "websubnethaaz"
+                    },
+                    {
+                        "Ref": "websubnetaz"
+                    }
+                ],
+                "LaunchConfigurationName": {
+                    "Ref": "webserverlc"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "webserverlb"
+                    }
+                ],
+                "MaxSize": "5",
+                "MinSize": "1",
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "websubnet"
+                    },
+                    {
+                        "Ref": "websubnetha"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "webserver",
+                        "PropagateAtLaunch": "True"
+                    }
+                ]
+            }
+        },
+        "webserverlb": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "Listeners": [
+                    {
+                        "InstancePort": "80",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "80",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "HealthCheck": {
+                    "HealthyThreshold": "3",
+                    "Interval": "6",
+                    "Target": "TCP:80",
+                    "UnhealthyThreshold": "2",
+                    "Timeout": "5"
+                },
+                "Scheme": "internet-facing",
+                "SecurityGroups": [
+                    {
+                        "Ref": "websecuritygroup"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "webserverlb"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "websubnet"
+                    },
+                    {
+                        "Ref": "websubnetha"
+                    }
+                ]
+            }
         }
     },
-    "Outputs": {}
+    "Outputs": {
+        "webserverurl": {
+            "Description": "Url of the Webserver Created",
+            "Value": {
+                "Fn::Join": [
+                    "://",
+                    [
+                        "http",
+                        {
+                            "Fn::GetAtt": [
+                                "webserverlb",
+                                "DNSName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        }
+    }
 }
