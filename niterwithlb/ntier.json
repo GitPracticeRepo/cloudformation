@@ -518,10 +518,123 @@
                     }
                 ]
             }
+        },
+        "appserverlc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "ubuntu18ami"
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "appserversize"
+                },
+                "KeyName": {
+                    "Ref": "keypair"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "appsecuritygroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash \n",
+                                "sudo apt-get update \n",
+                                "sudo apt-get install tomcat8 -y \n",
+                                "sudo apt-get install stress -y \n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "appserverasg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    {
+                        "Ref": "appsubnethaaz"
+                    },
+                    {
+                        "Ref": "appsubnetaz"
+                    }
+                ],
+                "LaunchConfigurationName": {
+                    "Ref": "appserverlc"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "appserverlb"
+                    }
+                ],
+                "MaxSize": "5",
+                "MinSize": "1",
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "appsubnet"
+                    },
+                    {
+                        "Ref": "appsubnetha"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "appserver",
+                        "PropagateAtLaunch": "True"
+                    }
+                ]
+            }
+        },
+        "appserverlb": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "Listeners": [
+                    {
+                        "InstancePort": "8080",
+                        "InstanceProtocol": "TCP",
+                        "LoadBalancerPort": "8080",
+                        "Protocol": "TCP"
+                    }
+                ],
+                "HealthCheck": {
+                    "HealthyThreshold": "3",
+                    "Interval": "6",
+                    "Target": "TCP:8080",
+                    "UnhealthyThreshold": "2",
+                    "Timeout": "5"
+                },
+                "Scheme": "internal",
+                "SecurityGroups": [
+                    {
+                        "Ref": "appsecuritygroup"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "appserverlb"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "appsubnet"
+                    },
+                    {
+                        "Ref": "appsubnetha"
+                    }
+                ]
+            }
         }
-        
     },
-    "Outputs": {
-        
-    }
+    "Outputs": {}
 }
